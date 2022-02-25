@@ -15,8 +15,9 @@ def GetDifferenceCoef(image1, image2):
     return np.count_nonzero(hash1!=hash2)/len(hash1)
 
 def main():
-    image1 = Image.open('test images\\akudama drive.png')
-    image2 = Image.open('test images\\akudama drive wo logo.png')
+    directory_name = input("Введите название папки: ")
+    image1 = Image.open(f'{directory_name}\\{int(input("Введите номер первой картинки: "))}.png')
+    image2 = Image.open(f'{directory_name}\\{int(input("Введите номер второй картинки: "))}.png')
     sim = GetDifferenceCoef(image1,image2)
     print(sim)
 
