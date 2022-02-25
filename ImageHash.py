@@ -5,8 +5,8 @@ def GetImageHash(image):
     resized = image.resize((8,8))
     gray = resized.convert("L")
     arr = np.array(gray)
-    treshold = np.mean(arr)
-    hash = [1 if i >= treshold else 0 for i in arr.flatten()]
+    threshold = np.mean(arr)
+    hash = [1 if i >= threshold else 0 for i in arr.flatten()]
     return hash
 
 def GetDifferenceCoef(image1, image2):
