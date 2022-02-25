@@ -2,7 +2,7 @@ from PIL import Image
 import numpy as np
 
 def GetImageHash(image):
-    resized = image.resize((8,8))
+    resized = image.resize((64,64))
     gray = resized.convert("L")
     arr = np.array(gray)
     threshold = np.mean(arr)
