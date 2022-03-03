@@ -16,8 +16,8 @@ def GetDifferenceCoef(image1, image2):
 
 def main():
     directory_name = input("Введите название папки: ")
-    image1 = Image.open(f'{directory_name}\\{int(input("Введите номер первой картинки: "))}.png')
-    image2 = Image.open(f'{directory_name}\\{int(input("Введите номер второй картинки: "))}.png')
+    image1 = Image.open(f'{directory_name}\\{input("Введите название первой картинки: ")}')
+    image2 = Image.open(f'{directory_name}\\{input("Введите название второй картинки: ")}')
     sim = GetDifferenceCoef(image1,image2)
     print(sim)
 
