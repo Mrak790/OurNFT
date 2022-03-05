@@ -28,3 +28,7 @@ deactivate
 pip install -r requirements.txt
 ```
 5. Ask for file with secrets in our chat.
+
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
