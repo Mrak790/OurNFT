@@ -12,7 +12,7 @@ pip install virtualenv
 ```python
 python -m venv ournft-env
 ```
-3. Turn the environment on:
+3. Go to directory with repository and turn the environment on:
    
 ```python
 ./ournft-env/Scripts/activate
