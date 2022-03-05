@@ -5,7 +5,7 @@ Windows:
 1. Install venv for creating virtual environments:
    
 ```python
-pip install venv
+pip install virtualenv
 ```
 2. Create new environment called 'ournft-env':
    
