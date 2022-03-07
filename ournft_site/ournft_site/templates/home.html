@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+ 
+    <title>Our NFT</title>
+    <h1>Our NFT</h1>
+</head>
+<body class="container mt-5">
+<nav class="mb-3">
+    {% if user.is_authenticated %}
+        <form action="{% url 'accounts:logout' %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-primary btn-sm" type="submit">Log Out</button>
+        </form>
+
+        <form action="{% url 'accounts:profile' %}" method="get">
+            <button class="btn btn-primary btn-sm" type="submit">Profile</button>
+        </form>
+
+    {% else %}
+    <form action="{% url 'accounts:login' %}" method="get">
+        <button class="btn btn-primary btn-sm" type="submit">Log In</button>
+    </form>
+
+    <form action="{% url 'accounts:signup' %}" method="get">
+        <button class="btn btn-primary btn-sm" type="submit">Signup</button>
+    </form>
+    {% endif %}
+</nav>
+
+</body>
+</html>
