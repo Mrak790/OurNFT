@@ -5,3 +5,4 @@ secret_key.py
 ournft_site/db.sqlite3
 .vscode/
 ournft_site/media/
+migrations/
