@@ -1,0 +1,40 @@
+{% extends "./layout/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container content">
+    <h2>My profile</h2>
+</div>
+
+
+<div class="container content">
+    <h2>{{ selected_user.get_full_name }}</h2>
+
+    <div class="row" style="margin-left: 20px;">
+        <div class="col5">
+            <br>
+            <br>
+            {% if selected_user.id == user.id %}
+                <form action="{% url 'accounts:edit_profile' %}" method="get">
+                    <button class="btn btn-primary btn-sm" type="submit">Edit</button>
+                </form>
+            {% endif %}
+        </div>
+        <div class="col">
+            <dl class="row">
+                <dt class="col-sm-3 text-right">Name</dt>
+                <dd class="col-sm-9">{{ selected_user.username }}</dd>
+
+
+                <dt class="col-sm-3 text-right">Info</dt>
+                <dd class="col-sm-9"><em style="font-family: 'Times New Roman', serif;">{{ selected_user.profile.bio|linebreaks }}</em></dd>
+            </dl>
+        </div>
+    </div>
+</div>
+
+<form action="{% url 'home' %}" method="get">
+    <button class="btn btn-primary btn-sm" type="submit">Main page</button>
+</form>
+
+{% endblock content %}
