@@ -22,10 +22,9 @@ def diff(hash1, hash2):
 class Image(models.Model):
     image = models.ImageField(upload_to=image_path)
     image_hash = models.CharField(max_length=64, null=True)
-    ouwner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
-    def save(self, *args, **kwargs) -> Boolean:
-        
+    def save(self, *args, **kwargs):
         self.image_hash = f'{imagehash.phash(imagehash.Image.open(self.image))}'
         query = Image.objects.values_list('image_hash')
         if not [i[0] for i in query if diff(i[0], self.image_hash) < DIFF_THRESHOLD]:

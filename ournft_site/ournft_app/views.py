@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-
+from django.contrib.auth.models import User
 from .forms import ImageForm
 from django.contrib.auth.decorators import login_required
 
@@ -9,6 +9,7 @@ def image_upload_view(request):
     if request.method == 'POST':
         form = ImageForm(request.POST, request.FILES)
         if form.is_valid():
+            form.instance.owner = User.objects.get(id=request.user.id)
             form.save()
             img_obj = form.instance
             return render(request, 'index.html', {'form': form, 'img_obj': img_obj, 'is_unique': form.instance.is_unique})
