@@ -23,7 +23,7 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
 
-    path('', include('ournft_app.urls')),
+    path('upload/', include('ournft_app.urls')),
   
     path('accounts/', include('accounts.urls'))
 

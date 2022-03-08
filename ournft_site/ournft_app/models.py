@@ -1,5 +1,6 @@
 from tkinter import CASCADE
 from wsgiref.simple_server import demo_app
+from xmlrpc.client import Boolean
 from django.db import models
 from django.contrib.auth.models import User
 import imagehash
@@ -23,16 +24,16 @@ class Image(models.Model):
     image_hash = models.CharField(max_length=64, null=True)
     ouwner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> Boolean:
         
         self.image_hash = f'{imagehash.phash(imagehash.Image.open(self.image))}'
         query = Image.objects.values_list('image_hash')
         if not [i[0] for i in query if diff(i[0], self.image_hash) < DIFF_THRESHOLD]:
             super().save(*args, **kwargs)
-            return True
+            self.is_unique = True
         else:
             print("not unique image")
-            return False
+            self.is_unique = False
 
 class Post(models.Model):
     datetime = models.DateTimeField(verbose_name=u"Date", auto_now_add=True)
