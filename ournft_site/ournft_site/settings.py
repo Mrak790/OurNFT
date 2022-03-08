@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ournft_app',
+    'ournft_site',
+    'accounts',
 ]
 
 MIDDLEWARE = [
