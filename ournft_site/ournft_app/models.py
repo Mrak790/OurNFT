@@ -9,7 +9,7 @@ from numpy import true_divide
 DIFF_THRESHOLD = 0.2
 
 def image_path(instance, filename):
-    return f'images/{instance.image_hash}.jpg'
+    return f'images/{instance.image_hash}.png'
 
 def diff(hash1, hash2):
     q1 = bin(int(hash1,16))[2:]
@@ -19,10 +19,19 @@ def diff(hash1, hash2):
     return hamm_dist/len(q1)
 
 
+class PublicImageManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(visibility=True)
+
 class Image(models.Model):
-    image = models.ImageField(upload_to=image_path)
+    datetime = models.DateTimeField(verbose_name="Date", auto_now_add=True)
+    image = models.ImageField(upload_to=image_path,verbose_name="Image")
     image_hash = models.CharField(max_length=64, null=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Owner", related_name="images")
+    text = models.CharField(max_length=200, verbose_name="Text", null=True, blank=True)
+    visibility = models.BooleanField(verbose_name="Visible", null=False)
+
+    public = PublicImageManager()
 
     def save(self, *args, **kwargs):
         self.image_hash = f'{imagehash.phash(imagehash.Image.open(self.image))}'
@@ -33,6 +42,14 @@ class Image(models.Model):
         else:
             print("not unique image")
             self.is_unique = False
+
+    class Meta:
+        ordering = ["-datetime"]
+
+    def __str__(self):
+        return "{}'s post".format(self.author.__str__())
+
+
 
 class Post(models.Model):
     datetime = models.DateTimeField(verbose_name=u"Date", auto_now_add=True)
