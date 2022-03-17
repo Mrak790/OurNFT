@@ -31,6 +31,7 @@ class Image(models.Model):
     text = models.CharField(max_length=200, verbose_name="Text", null=True, blank=True)
     visibility = models.BooleanField(verbose_name="Visible", null=False)
 
+    objects = models.Manager()
     public = PublicImageManager()
 
     def save(self, *args, **kwargs):
