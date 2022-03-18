@@ -1,6 +1,8 @@
+__pycache__/
 ournft-env/
 secret_settings.py
 secret_key.py
-ournft_site/ournft_site/__pycache__/
 ournft_site/db.sqlite3
 .vscode/
+ournft_site/media/
+migrations/
