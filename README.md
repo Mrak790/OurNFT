@@ -11,8 +11,14 @@ Setup on Ubuntu:
 bash  script.sh
 ```
 
-Run server:
+Run server (windows):
 
 ```python
 python runserver.py
+```
+
+Run server (ubuntu):
+
+```python
+python3 runserver.py
 ```
