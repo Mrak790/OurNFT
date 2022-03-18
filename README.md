@@ -6,6 +6,11 @@ Setup on windows (once after cloning):
 python setup.py
 ```
 
+Setup on Ubuntu:
+```
+bash  script.sh
+```
+
 Run server:
 
 ```python
