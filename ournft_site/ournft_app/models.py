@@ -1,5 +1,5 @@
 from tabnanny import verbose
-from tkinter import CASCADE
+# from tkinter import CASCADE
 from wsgiref.simple_server import demo_app
 from xmlrpc.client import Boolean
 from django.db import models
