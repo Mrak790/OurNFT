@@ -4,6 +4,7 @@ from .forms import ImageForm
 from .models import Image
 from django.contrib.auth.decorators import login_required
 
+
 @login_required(login_url='home')
 def image_upload_view(request):
     """Process images uploaded by users"""
