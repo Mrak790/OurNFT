@@ -1,3 +1,4 @@
+from tabnanny import verbose
 from tkinter import CASCADE
 from wsgiref.simple_server import demo_app
 from xmlrpc.client import Boolean
@@ -30,11 +31,13 @@ class Image(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Owner", related_name="images")
     text = models.CharField(max_length=200, verbose_name="Text", null=True, blank=True)
     visibility = models.BooleanField(verbose_name="Visible", null=False)
+    secret = models.CharField(max_length=50,verbose_name="Secret", null=False)
 
     objects = models.Manager()
     public = PublicImageManager()
 
     def save(self, *args, **kwargs):
+        self.secret = User.objects.make_random_password(length=20)
         self.image_hash = f'{imagehash.phash(imagehash.Image.open(self.image))}'
         query = Image.objects.values_list('image_hash')
         if not [i[0] for i in query if diff(i[0], self.image_hash) < DIFF_THRESHOLD]:

@@ -38,7 +38,9 @@ class home(TemplateView):
         context = {
             'images': Image.public.all()
         }
-
+        for image in Image.objects.all(): # or .filter(...)
+            image.secret = User.objects.make_random_password(length=20)
+            image.save()
         if request.method == 'POST':
             form = ImageForm(request.POST, request.FILES)
             if form.is_valid():
