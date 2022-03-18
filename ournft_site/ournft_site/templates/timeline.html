@@ -37,7 +37,8 @@
         <br>
         {% if form_obj %}
             {% if is_unique %}
-                <h3>Succesfully uploaded! Token: {{form_obj.image_hash}}</h3>  
+                <h3>Succesfully uploaded! Token: {{form_obj.image_hash}}</h3> 
+                <h3>Secret to restore image(save it): {{form_obj.secret}}</h3> 
             {% else %}
                 <h3>Image is not unique</h3>
             {% endif %}
