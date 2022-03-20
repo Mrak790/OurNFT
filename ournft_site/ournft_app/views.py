@@ -33,9 +33,6 @@ def image_restore_view(request):
     if request.method == 'POST':
         try:
             form = RestoreImageForm(request.POST, request.FILES)
-            # print(GetImageHash(form.files['image']))
-            # print(form.data['secret'])
-            # print(obj)
             if form.is_valid():
                 obj=Image.objects.get(image_hash=GetImageHash(form.files['image']),secret=form.data['secret'])
                 obj.owner = request.user
