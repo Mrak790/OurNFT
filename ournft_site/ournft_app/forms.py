@@ -8,14 +8,10 @@ class ImageForm(forms.ModelForm):
     class Meta:
         model = Image
         fields = ['image', 'text', 'visibility']
-        # exclude = ['owner']
 
 
-from .models import Post
-
-class PostForm(forms.ModelForm):
-
+class RestoreImageForm(forms.ModelForm):
     class Meta:
-        model = Post
-        exclude = ['author']
-
+        model = Image
+        fields = ['image', 'secret']
+    
