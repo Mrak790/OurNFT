@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from django.utils.timezone import make_aware
+from django.views.generic import TemplateView
 
 def image_view(request, image_hash):
     """Process images uploaded by users"""
@@ -15,10 +16,7 @@ def image_view(request, image_hash):
         'image':image
     }
     return render(request, 'image.html', context)
-
-
-
-
+  
 
 @login_required(login_url='home')
 def image_restore_view(request):
@@ -60,7 +58,6 @@ def image_restore_view(request):
         return render(request, 'restore.html', context)
 
 
-from django.views.generic import TemplateView
 
 class home(TemplateView):      
     template_name = "home.html"
