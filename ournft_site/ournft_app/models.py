@@ -24,10 +24,17 @@ class PublicImageManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(visibility=True)
 
+def GetImageHash(image):
+    return f'{imagehash.phash(imagehash.Image.open(image))}'
+
+def IsUnique(image_hash):
+    query = Image.objects.values_list('image_hash')
+    return not [i[0] for i in query if diff(i[0], image_hash) < DIFF_THRESHOLD]
+
 class Image(models.Model):
     datetime = models.DateTimeField(verbose_name="Date", auto_now_add=True)
     image = models.ImageField(upload_to=image_path,verbose_name="Image")
-    image_hash = models.CharField(max_length=64, null=True)
+    image_hash = models.CharField(max_length=64,verbose_name="Token", null=False, primary_key=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Owner", related_name="images")
     text = models.CharField(max_length=200, verbose_name="Text", null=True, blank=True)
     visibility = models.BooleanField(verbose_name="Visible", null=False)
@@ -35,35 +42,27 @@ class Image(models.Model):
 
     objects = models.Manager()
     public = PublicImageManager()
+    
 
-    def save(self, *args, **kwargs):
-        self.secret = User.objects.make_random_password(length=20)
-        self.image_hash = f'{imagehash.phash(imagehash.Image.open(self.image))}'
-        query = Image.objects.values_list('image_hash')
-        if not [i[0] for i in query if diff(i[0], self.image_hash) < DIFF_THRESHOLD]:
-            super().save(*args, **kwargs)
-            self.is_unique = True
+    def save(self, is_creating = True, *args, **kwargs):
+        is_unique = True
+        if is_creating:
+            print("create image object")
+            self.secret = User.objects.make_random_password(length=20)
+            self.image_hash = GetImageHash(self.image)
+            if IsUnique(self.image_hash):
+                super().save(*args, **kwargs)
+                is_unique = True
+            else:
+                print("not unique image")
+                is_unique = False
         else:
-            print("not unique image")
-            self.is_unique = False
+            print("change image object")
+            super().save(*args, **kwargs)
+        return is_unique
 
     class Meta:
         ordering = ["-datetime"]
 
     def __str__(self):
-        return "{}'s post".format(self.author.__str__())
-
-
-
-class Post(models.Model):
-    datetime = models.DateTimeField(verbose_name=u"Date", auto_now_add=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=u"Author", related_name="posts")
-    text = models.CharField(max_length=200, verbose_name=u"Text", null=True, blank=True)
-    image = models.ImageField(verbose_name=u"Image", null=True, blank=True)
-
-    class Meta:
-        ordering = ["-datetime"]
-
-    def __str__(self):
-        return "{}'s post".format(self.author.__str__())
-
+        return "{}'s post".format(self.owner.__str__())
