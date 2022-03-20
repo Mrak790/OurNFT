@@ -7,24 +7,16 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from django.utils.timezone import make_aware
+from django.views.generic import TemplateView
 
-@login_required(login_url='home')
-def image_upload_view(request):
+def image_view(request, image_hash):
     """Process images uploaded by users"""
-    if request.method == 'POST':
-        form = ImageForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.instance.owner = request.user
-            form.save()
-            img_obj = form.instance
-            return render(request, 'index.html', {'form': form, 'img_obj': img_obj, 'is_unique': form.instance.is_unique})
-    else:
-        form = ImageForm()
-    return render(request, 'index.html', {'form': form})
-
-
-
-
+    image = Image.objects.get(image_hash=image_hash)
+    context = {
+        'image':image
+    }
+    return render(request, 'image.html', context)
+  
 
 @login_required(login_url='home')
 def image_restore_view(request):
@@ -66,7 +58,6 @@ def image_restore_view(request):
         return render(request, 'restore.html', context)
 
 
-from django.views.generic import TemplateView
 
 class home(TemplateView):      
     template_name = "home.html"
