@@ -1,30 +1,64 @@
-from django.shortcuts import render, redirect
+from email.mime import image
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
-from .forms import ImageForm
-from .models import Image
+from .forms import ImageForm, RestoreImageForm
+from .models import Image, GetImageHash
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from datetime import datetime
+from django.utils.timezone import make_aware
+from django.views.generic import TemplateView
+from django.http import HttpResponseNotFound
+
+def image_view(request, image_hash):
+    image = get_object_or_404(Image, image_hash=image_hash)
+    if image.visibility or image.owner == request.user:
+        context = {
+            'image':image
+        }
+        return render(request, 'image.html', context)
+    else :
+        return HttpResponseNotFound()
 
 
 @login_required(login_url='home')
-def image_upload_view(request):
+def image_restore_view(request):
     """Process images uploaded by users"""
+    context = {}
     if request.method == 'POST':
-        form = ImageForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.instance.owner = request.user
-            form.save()
-            img_obj = form.instance
-            return render(request, 'index.html', {'form': form, 'img_obj': img_obj, 'is_unique': form.instance.is_unique})
+        try:
+            form = RestoreImageForm(request.POST, request.FILES)
+            if form.is_valid():
+                obj=Image.objects.get(image_hash=GetImageHash(form.files['image']),secret=form.data['secret'])
+                obj.owner = request.user
+                obj.datetime = make_aware(datetime.now())
+                obj.save(is_creating=False)
+                context = {
+                    'accepted': True,
+                    'image' : obj.image,
+                    'asked' : True,
+                    'form' : form
+                }
+                return render(request, 'restore.html', context)
+            else:
+                print('invalid form')
+                print(form.errors)
+        except ObjectDoesNotExist:
+            print("Wrong image or secret")
+
+        context = {
+                'accepted': False,
+                'asked' : True,
+                'form' : form
+            }    
+        return render(request, 'restore.html', context)
     else:
-        form = ImageForm()
-    return render(request, 'index.html', {'form': form})
-
-
-from django.views.generic import TemplateView
-
-
-from .models import Post
-from .forms import PostForm
+        form = RestoreImageForm()
+        context = {
+            'asked' : False,
+            'form' : form
+        }
+        return render(request, 'restore.html', context)
 
 
 
@@ -39,13 +73,15 @@ class home(TemplateView):
         context = {
             'images': Image.public.all()
         }
+        
         if request.method == 'POST':
             form = ImageForm(request.POST, request.FILES)
             if form.is_valid():
                 form.instance.owner = request.user
-                form.save()
+                saved_form = form.save()
+                is_unique = saved_form.is_unique
                 context['form_obj'] = form.instance
-                context['is_unique'] = form.instance.is_unique
+                context['is_unique'] = is_unique
                 # return redirect('home')
         else:
             form = ImageForm()
