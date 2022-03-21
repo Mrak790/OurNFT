@@ -45,21 +45,19 @@ class Image(models.Model):
     
 
     def save(self, is_creating = True, *args, **kwargs):
-        is_unique = True
         if is_creating:
             print("create image object")
             self.secret = User.objects.make_random_password(length=20)
             self.image_hash = GetImageHash(self.image)
             if IsUnique(self.image_hash):
+                self.is_unique = True
                 super().save(*args, **kwargs)
-                is_unique = True
             else:
                 print("not unique image")
-                is_unique = False
+                self.is_unique = False
         else:
             print("change image object")
             super().save(*args, **kwargs)
-        return is_unique
 
     class Meta:
         ordering = ["-datetime"]

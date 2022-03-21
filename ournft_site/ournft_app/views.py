@@ -1,5 +1,5 @@
 from email.mime import image
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
 from .forms import ImageForm, RestoreImageForm
 from .models import Image, GetImageHash
@@ -7,14 +7,17 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from django.utils.timezone import make_aware
+from django.http import HttpResponseNotFound
 
 def image_view(request, image_hash):
-    """Process images uploaded by users"""
-    image = Image.objects.get(image_hash=image_hash)
-    context = {
-        'image':image
-    }
-    return render(request, 'image.html', context)
+    image = get_object_or_404(Image, image_hash=image_hash)
+    if image.visibility or image.owner == request.user:
+        context = {
+            'image':image
+        }
+        return render(request, 'image.html', context)
+    else :
+        return HttpResponseNotFound()
 
 
 
@@ -73,13 +76,14 @@ class home(TemplateView):
         context = {
             'images': Image.public.all()
         }
+        
         if request.method == 'POST':
             form = ImageForm(request.POST, request.FILES)
             if form.is_valid():
                 form.instance.owner = request.user
-                is_unique = form.save()
+                saved_form = form.save()
+                is_unique = saved_form.is_unique
                 context['form_obj'] = form.instance
-                print("pk: ", form.instance.pk)
                 context['is_unique'] = is_unique
                 # return redirect('home')
         else:
