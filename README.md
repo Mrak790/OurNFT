@@ -22,3 +22,6 @@ Run server (ubuntu):
 ```python
 python3 runserver.py
 ```
+
+/restore - to restore image with secret key
+/images/<public token>  - get info about image
