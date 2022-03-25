@@ -15,25 +15,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-#<<<<<<< likes
-#=======
 from ournft_app import views
-#>>>>>>> main
 
 urlpatterns = [
 
     path('', views.home.as_view(), name='home'),
 
     path('admin/', admin.site.urls),
-#<<<<<<< likes
-    path('', include('blog.urls')),
-#=======
 
     path('', include('ournft_app.urls')),
   
     path('accounts/', include('accounts.urls'))
 
-#>>>>>>> main
 ]
 
 from django.conf import settings
