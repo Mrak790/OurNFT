@@ -5,16 +5,7 @@
   <h3> Uploaded: {{image.upload_datetime}} </h3>
   <h3> Visible: {{image.visibility}} </h3>
 
-  <form action="{% url 'image_like' image.image_hash%}" method='POST' class="ui form">
-    {% csrf_token %}
-    <input type="hidden" name="next" value="{{ request.path }}">
-    {% if user not in image.likes.all %}
-      <button class="ui button positive" type='submit'>Like</button>
-    {% else%}
-      <button class="ui button negative" type='submit'>Unlike</button>
-    {% endif %}
-    <strong>{{ image.likes.all.count }} like</strong>
-</form>
+  {% include "likes.html" %}
 
   <div class="history">
     <h3> History of ownership: </h3>
