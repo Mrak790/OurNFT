@@ -2,7 +2,7 @@ from email.mime import image
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
 from .forms import ImageForm, RestoreImageForm
-from .models import Image, GetImageHash
+from .models import Image, History
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
@@ -26,32 +26,30 @@ def image_restore_view(request):
     """Process images uploaded by users"""
     context = {}
     if request.method == 'POST':
-        try:
-            form = RestoreImageForm(request.POST, request.FILES)
-            if form.is_valid():
-                obj=Image.objects.get(image_hash=GetImageHash(form.files['image']),secret=form.data['secret'])
-                obj.owner = request.user
-                obj.datetime = make_aware(datetime.now())
-                obj.save(is_creating=False)
+        form = RestoreImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                obj=Image.objects.get(image_hash=Image.GetImageHash(form.files['image']),secret=form.data['secret'])
+            except ObjectDoesNotExist:
+                print("Wrong image or secret")
                 context = {
-                    'accepted': True,
-                    'image' : obj.image,
-                    'asked' : True,
-                    'form' : form
-                }
-                return render(request, 'restore.html', context)
-            else:
-                print('invalid form')
-                print(form.errors)
-        except ObjectDoesNotExist:
-            print("Wrong image or secret")
-
-        context = {
                 'accepted': False,
                 'asked' : True,
                 'form' : form
-            }    
-        return render(request, 'restore.html', context)
+                }    
+                return render(request, 'restore.html', context)
+            obj.owner = request.user
+            obj.save()
+            record = History(id=None, datetime= make_aware(datetime.now()), referred_image = obj,  referred_owner = obj.owner)
+            record.save()
+            context = {
+                'accepted': True,
+                'image' : obj.image,
+                'secret': obj.secret,
+                'asked' : True,
+                'form' : form
+            }
+            return render(request, 'restore.html', context)
     else:
         form = RestoreImageForm()
         context = {
@@ -78,11 +76,16 @@ class home(TemplateView):
             form = ImageForm(request.POST, request.FILES)
             if form.is_valid():
                 form.instance.owner = request.user
-                saved_form = form.save()
-                is_unique = saved_form.is_unique
-                context['form_obj'] = form.instance
-                context['is_unique'] = is_unique
-                # return redirect('home')
+                form.instance.image_hash = Image.GetImageHash(form.instance.image)
+                if Image.IsUnique(form.instance.image_hash):
+                    form.save()
+                    record = History(id=None, datetime=form.instance.upload_datetime, referred_image = form.instance,  referred_owner = form.instance.owner)
+                    record.save()
+                    context['form_obj'] = form.instance
+                    context['is_unique'] = True
+                else:
+                    context['form_obj'] = form.instance
+                    context['is_unique'] = False
         else:
             form = ImageForm()
 

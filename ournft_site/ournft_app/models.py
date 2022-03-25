@@ -6,6 +6,8 @@ from django.db import models
 from django.contrib.auth.models import User
 import imagehash
 from numpy import true_divide
+from datetime import datetime
+from django.utils.timezone import make_aware
 # Create your models here.
 DIFF_THRESHOLD = 0.2
 
@@ -24,17 +26,10 @@ class PublicImageManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(visibility=True)
 
-def GetImageHash(image):
-    return f'{imagehash.phash(imagehash.Image.open(image))}'
-
-def IsUnique(image_hash):
-    query = Image.objects.values_list('image_hash')
-    return not [i[0] for i in query if diff(i[0], image_hash) < DIFF_THRESHOLD]
-
 class Image(models.Model):
-    datetime = models.DateTimeField(verbose_name="Date", auto_now_add=True)
+    upload_datetime = models.DateTimeField(verbose_name="Date", auto_now_add=True)
     image = models.ImageField(upload_to=image_path,verbose_name="Image")
-    image_hash = models.CharField(max_length=64,verbose_name="Token", null=False, primary_key=True)
+    image_hash = models.CharField(max_length=64,verbose_name="Token", null=False)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Owner", related_name="images")
     text = models.CharField(max_length=200, verbose_name="Text", null=True, blank=True)
     visibility = models.BooleanField(verbose_name="Visible", null=False)
@@ -44,23 +39,29 @@ class Image(models.Model):
     public = PublicImageManager()
     
 
-    def save(self, is_creating = True, *args, **kwargs):
-        if is_creating:
+    def save(self, *args, **kwargs):
+        if self.pk:
             print("create image object")
-            self.secret = User.objects.make_random_password(length=20)
-            self.image_hash = GetImageHash(self.image)
-            if IsUnique(self.image_hash):
-                self.is_unique = True
-                super().save(*args, **kwargs)
-            else:
-                print("not unique image")
-                self.is_unique = False
         else:
             print("change image object")
-            super().save(*args, **kwargs)
+        self.secret = User.objects.make_random_password(length=20)
+        super().save(*args, **kwargs)
 
     class Meta:
-        ordering = ["-datetime"]
+        ordering = ["-upload_datetime"]
 
     def __str__(self):
         return "{}'s post".format(self.owner.__str__())
+
+    def GetImageHash(image):
+        return f'{imagehash.phash(imagehash.Image.open(image))}'
+
+    def IsUnique(image_hash):
+        query = Image.objects.values_list('image_hash')
+        return not [i[0] for i in query if diff(i[0], image_hash) < DIFF_THRESHOLD]
+
+
+class History(models.Model):
+    datetime = models.DateTimeField(verbose_name="Date", auto_now_add=True)
+    referred_owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Owner", related_name="record")
+    referred_image = models.ForeignKey(Image, on_delete=models.CASCADE, verbose_name="Image", related_name="record")
