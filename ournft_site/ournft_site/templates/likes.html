@@ -1,0 +1,10 @@
+<form action="{% url 'image_like' image.image_hash%}" method='POST' class="ui form">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    {% if user not in image.likes.all %}
+      <button class="ui button positive" type='submit'>Like</button>
+    {% else%}
+      <button class="ui button negative" type='submit'>Unlike</button>
+    {% endif %}
+    <strong>{{ image.total_likes }} like</strong>
+</form>
