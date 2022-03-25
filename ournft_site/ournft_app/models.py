@@ -3,6 +3,34 @@ from tabnanny import verbose
 from wsgiref.simple_server import demo_app
 from xmlrpc.client import Boolean
 from django.db import models
+#<<<<<<< likes
+from taggit.managers import TaggableManager
+
+# Create your models here.
+class IpModel(models.Model):
+    ip = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.ip
+
+class Blog(models.Model):
+    title = models.CharField(max_length=150)
+    created_at = models.DateTimeField(auto_now_add=True)
+    description = models.CharField(max_length=550)
+    tags = TaggableManager()
+    views = models.ManyToManyField(IpModel, related_name="post_views", blank=True)
+    likes = models.ManyToManyField(IpModel, related_name="post_likes", blank=True)
+
+
+    def __str__(self):
+        return self.title
+
+    def total_views(self):
+        return self.views.count()
+
+    def total_likes(self):
+        return self.likes.count()
+#=======
 from django.contrib.auth.models import User
 import imagehash
 from numpy import true_divide
@@ -65,3 +93,4 @@ class History(models.Model):
     datetime = models.DateTimeField(verbose_name="Date", auto_now_add=True)
     referred_owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Owner", related_name="record")
     referred_image = models.ForeignKey(Image, on_delete=models.CASCADE, verbose_name="Image", related_name="record")
+#>>>>>>> main

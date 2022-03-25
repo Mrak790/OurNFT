@@ -1,7 +1,7 @@
-"""ournft_site URL Configuration
+"""blogpost URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.0/topics/http/urls/
+    https://docs.djangoproject.com/en/3.1/topics/http/urls/
 Examples:
 Function views
     1. Add an import:  from my_app import views
@@ -15,18 +15,25 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+#<<<<<<< likes
+#=======
 from ournft_app import views
+#>>>>>>> main
 
 urlpatterns = [
 
     path('', views.home.as_view(), name='home'),
 
     path('admin/', admin.site.urls),
+#<<<<<<< likes
+    path('', include('blog.urls')),
+#=======
 
     path('', include('ournft_app.urls')),
   
     path('accounts/', include('accounts.urls'))
 
+#>>>>>>> main
 ]
 
 from django.conf import settings
