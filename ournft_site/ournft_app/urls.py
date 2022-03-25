@@ -1,4 +1,5 @@
 from django.urls import path
+#<<<<<<< likes
 from . import views
 
 urlpatterns = [
@@ -7,3 +8,15 @@ urlpatterns = [
     path('detail/<int:pk>', views.PostDetailView.as_view(), name='post_detail'),
     path('like/<int:pk>', views.postLike, name='blog_like'),
 ]
+#=======
+from django.conf.urls import include
+from ournft_app import views
+
+urlpatterns = [
+
+    path('restore/', views.image_restore_view),
+  
+    path('images/<slug:image_hash>/', views.image_view)
+
+]
+#>>>>>>> main

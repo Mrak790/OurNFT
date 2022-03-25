@@ -1,0 +1,7 @@
+{% if image %}
+  <img src="{{image.image.url}}" alt="connect" style="max-height:300px">
+  <h3> {{image.text}} </h3>
+  <h3> {{image.owner}} </h3>
+  <h3> {{image.datetime}} </h3>
+  <h3> Visible: {{image.visibility}} </h3>
+{% endif %}

@@ -14,7 +14,15 @@ from pathlib import Path
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+#<<<<<<< likes
 TEMPLATE_DIR = os.path.join(BASE_DIR,'templates')
+#=======
+
+from os import path
+MEDIA_ROOT = path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+#>>>>>>> main
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -25,7 +33,7 @@ SECRET_KEY = '&92#)28nfb2xy3sw4jq3lb2&2^dm-z-__74m8f+&56_%f5p5vn'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]']
 
 
 # Application definition
@@ -37,8 +45,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+#<<<<<<< likes
     'blog',
     'taggit',
+#=======
+    'ournft_app',
+    'ournft_site',
+    'accounts',
+#>>>>>>> main
 ]
 
 MIDDLEWARE = [
@@ -56,7 +70,12 @@ ROOT_URLCONF = 'blogpost.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+#<<<<<<< likes
         'DIRS': [TEMPLATE_DIR,],
+#=======
+        'DIRS': [path.join(BASE_DIR, 'templates'),
+        ],
+#>>>>>>> main
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
