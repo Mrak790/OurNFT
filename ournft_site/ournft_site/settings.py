@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'ournft_app',
     'ournft_site',
     'accounts',
+    'captcha',
 ]
 
 MIDDLEWARE = [

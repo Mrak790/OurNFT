@@ -25,7 +25,9 @@ urlpatterns = [
 
     path('', include('ournft_app.urls')),
   
-    path('accounts/', include('accounts.urls'))
+    path('accounts/', include('accounts.urls')),
+
+    path('captcha/', include("captcha.urls"))
 
 ]
 

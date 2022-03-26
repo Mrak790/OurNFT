@@ -6,6 +6,7 @@
     <form action="/accounts/signup/" method="post">
         {% csrf_token %}
         {{ form }}
+        {{ form_captcha }}
         <input type="submit" value="Signup">
     </form>
     
