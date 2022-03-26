@@ -2,6 +2,7 @@ from django import forms
 
 from .models import Image
 
+from captcha.fields import CaptchaField
 
 class ImageForm(forms.ModelForm):
     """Form for the image model"""
@@ -15,3 +16,5 @@ class RestoreImageForm(forms.ModelForm):
         model = Image
         fields = ['image', 'secret']
     
+class CaptchaForm(forms.Form):
+    captcha = CaptchaField()

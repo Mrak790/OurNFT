@@ -11,18 +11,23 @@ from .models import Profile
 from .forms import ProfileForm
 
 from django.urls import reverse
+from ournft_app.forms import CaptchaForm
 
 def signup_view(request):
 
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
-        if form.is_valid():
+
+        form_captcha = CaptchaForm(request.POST)
+
+        if form.is_valid() and form_captcha.is_valid():
             user = form.save()
             login(request, user)
             return redirect('home') 
     else:
         form = UserCreationForm()
-    return render(request, 'accounts/signup.html', {'form': form})
+        form_captcha = CaptchaForm()
+    return render(request, 'accounts/signup.html', {'form': form, 'form_captcha':form_captcha})
 
 def login_view(request):
     if request.method == 'POST':
