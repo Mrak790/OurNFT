@@ -104,8 +104,5 @@ def ImageLike(request, image_hash):
         image_obj.likes.remove(request.user)
     else:
         image_obj.likes.add(request.user)
-    # if request.path_info == 'image_detail':
-    #     return HttpResponseRedirect(reverse('image_detail', args=[image_hash]))
-    # else:
     next = request.POST.get('next', '/')
     return HttpResponseRedirect(next)
