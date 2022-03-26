@@ -6,7 +6,7 @@
   <h3> Visible: {{image.visibility}} </h3>
 
   {% include "likes.html" %}
-
+  <h3> Liked: {% for user in image.likes.all %} {{user}}; {% endfor %} </h3>
   <div class="history">
     <h3> History of ownership: </h3>
     {% for record in history %}

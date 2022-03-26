@@ -9,13 +9,14 @@ from django.utils.timezone import make_aware
 from django.views.generic import TemplateView
 from django.http import HttpResponseNotFound,HttpResponseRedirect
 
+
 def image_view(request, image_hash):
     image = get_object_or_404(Image, image_hash=image_hash)
     if image.visibility or image.owner == request.user:
         history = History.objects.filter(referred_image=image)
         context = {
             'image':image,
-            'history':history
+            'history':history,
         }
         return render(request, 'image.html', context)
     else :
@@ -71,7 +72,7 @@ class home(TemplateView):
             return render(request, self.template_name)
 
         context = {
-            'images': Image.public.all()
+            'images': Image.most_liked()[:10]
         }
         
         if request.method == 'POST':

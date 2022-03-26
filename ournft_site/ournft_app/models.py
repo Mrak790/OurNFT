@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Count
 import imagehash
 # Create your models here.
 DIFF_THRESHOLD = 0.2
@@ -57,6 +58,9 @@ class Image(models.Model):
     
     def total_likes(self):
         return self.likes.count()
+
+    def most_liked():
+        return Image.public.annotate(num_likes=Count('likes')).order_by('-num_likes')
 
 
 class History(models.Model):
