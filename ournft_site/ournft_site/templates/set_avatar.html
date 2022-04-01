@@ -1,0 +1,9 @@
+<form action="{% url 'accounts:set_avatar' image.image_hash %}" method='POST' class="ui form">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    {% if user.profile.avatar == image %}
+      <button class="ui button discard" type='submit'> Discard Avatar </button>
+    {% else%}
+      <button class="ui button set" type='submit'> Set Avatar </button>
+    {% endif %}
+</form>
