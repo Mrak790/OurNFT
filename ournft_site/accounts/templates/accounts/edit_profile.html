@@ -13,5 +13,23 @@
         </form>
     </div>
 </div>
+<div style="display: inline-block; width: 400px;">
+    <h2>Set Avatar</h2>
+    {% for image in images %}
+        <div class="card">
+            <div class="card-body">
+                {% if image.image.name %}
+                <a href="/images/{{image.image_hash}}">
+                    <img src="{{ image.image.url }}" alt="connect" style="max-height:300px"><br>
+                </a>
+                {% endif %}
+                {{ image.text }}
+                {% include "set_avatar.html" %}
+            </div>
+        </div>
+        
+    {% endfor %}
+</div>
+
 
 {% endblock content %}
