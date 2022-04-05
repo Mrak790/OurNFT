@@ -47,7 +47,7 @@ class Image(models.Model):
         ordering = ["-upload_datetime"]
 
     def __str__(self):
-        return "{}'s post".format(self.owner.__str__())
+        return str(self.image_hash)
 
     def GetImageHash(image):
         return f'{imagehash.phash(imagehash.Image.open(image))}'
@@ -67,3 +67,8 @@ class History(models.Model):
     datetime = models.DateTimeField(verbose_name="Date", auto_now_add=True)
     referred_owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Owner", related_name="record")
     referred_image = models.ForeignKey(Image, on_delete=models.CASCADE, verbose_name="Image", related_name="record")
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="New Owner", related_name="Notification")
+    new_image = models.ForeignKey(Image, on_delete=models.CASCADE, verbose_name="New Image", related_name="Notification")
