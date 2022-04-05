@@ -12,7 +12,7 @@ from .forms import ProfileForm
 
 from django.urls import reverse
 from ournft_app.forms import CaptchaForm
-from ournft_app.models import Image
+from ournft_app.models import Image, Notification
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 
@@ -57,7 +57,8 @@ class profile_view(TemplateView):
         # if not Profile.objects.filter(user=request.user).exists():
         #     return redirect('edit_profile')
         context = {
-            'selected_user': request.user
+            'selected_user': request.user,
+            'notifications' : Notification.objects.filter(user=request.user)
         }
         return render(request, self.template_name, context)
 

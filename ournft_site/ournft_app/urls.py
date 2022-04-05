@@ -11,4 +11,8 @@ urlpatterns = [
     path('images/<slug:image_hash>/', views.image_view, name='image_detail'),
 
     path('like/<slug:image_hash>', views.ImageLike, name='image_like'),
+
+    path('transfer/', views.image_transfer_view),
+
+    path('notification/<int:pk>', views.GetTransfer, name='notification'),
 ]

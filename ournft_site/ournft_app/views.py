@@ -1,13 +1,13 @@
 from django.shortcuts import render, get_object_or_404, reverse
 from django.contrib.auth.models import User
-from .forms import ImageForm, RestoreImageForm
-from .models import Image, History
+from .forms import ImageForm, RestoreImageForm, TransferForm
+from .models import Image, History, Notification
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from django.utils.timezone import make_aware
 from django.views.generic import TemplateView
-from django.http import HttpResponseNotFound,HttpResponseRedirect
+from django.http import HttpResponseNotFound, HttpResponseRedirect
 
 
 def image_view(request, image_hash):
@@ -40,6 +40,8 @@ def image_restore_view(request):
                 'form' : form
                 }    
                 return render(request, 'restore.html', context)
+            if obj.owner.avatar == obj:
+                obj.owner.avatar = None
             obj.owner = request.user
             obj.secret = User.objects.make_random_password(length=20)
             obj.save()
@@ -106,3 +108,53 @@ def ImageLike(request, image_hash):
         image_obj.likes.add(request.user)
     next = request.POST.get('next', '/')
     return HttpResponseRedirect(next)
+
+
+
+@login_required(login_url='home')
+def image_transfer_view(request):
+    context = {}
+    if request.method == 'POST':
+        form = TransferForm(request.POST, request.FILES, user = request.user)
+        if form.is_valid():
+            
+            obj = form.cleaned_data['image_hash']
+            obj.owner = form.cleaned_data['recipient']
+            obj.secret = User.objects.make_random_password(length=20)
+            obj.save()
+            record = History(id=None, datetime= make_aware(datetime.now()), referred_image = obj,  referred_owner = obj.owner)
+            record.save()
+            context = {
+                'accepted': True,
+                'image' : obj.image,
+                'form' : form
+            }
+            notification = Notification(user=obj.owner, new_image=obj)
+            notification.save()
+            return render(request, 'transfer.html', context)
+        else:
+            context = {
+                'form' : form
+                }    
+            return render(request, 'transfer.html', context)
+    else:
+        print("test")
+        form = TransferForm(user=request.user)
+        print(request.user.username)
+        context = {
+            'asked' : False,
+            'form' : form
+        }
+        return render(request, 'transfer.html', context)
+
+@login_required(login_url='home')
+def GetTransfer(request, pk):
+    notification_obj = get_object_or_404(Notification, pk=pk)
+    if notification_obj.user == request.user:
+        context = {
+        'image' : notification_obj.new_image,
+        }
+        notification_obj.delete()
+        return render(request, 'notification.html', context)
+    else:
+        return HttpResponseNotFound()

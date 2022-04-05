@@ -17,6 +17,14 @@
                     <img src="{{ user.profile.avatar.image.url }}" alt="connect" style="max-height:300px"><br>
                 <br>
             {% endif %}
+            {% for notification in notifications %}
+                <!-- <button class="button">
+                    <a href="{% url 'notification' notification.pk %}"> You got new image! See it: </a>
+                </button> -->
+                <a href="{% url 'notification' notification.pk %}">
+                    <button class="button"> You got new image! See it: </button>
+                </a>
+            {% endfor %}
             {% if selected_user.id == user.id %}
                 <form action="{% url 'accounts:edit_profile' %}" method="get">
                     <button class="btn btn-primary btn-sm" type="submit">Edit</button>
