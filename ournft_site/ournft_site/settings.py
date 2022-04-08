@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'ournft_site',
     'accounts',
     'captcha',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -123,8 +124,49 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+			['Undo','Redo'],
+			['Bold', 'Italic', 'Underline', 'Strikethrough'],
+			['Alignment', 'HorizontalLine'],
+			['BGColor', 'TextColor', 'FontFamily', 'FontSize'],
+			['ImageInsert', 'Link']
+		]
+    }
+}
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        # 'skin': 'moono',
+        'toolbar_Basic': [
+            ['Source', '-', 'Bold', 'Italic']
+        ],
+        'toolbar_YourCustomToolbarConfig': [
+            {'name': 'clipboard', 'items': ['Undo', 'Redo']},
+            '/',
+            {'name': 'basicstyles',
+             'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']},
+            {'name': 'paragraph',
+             'items': ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']},
+            {'name': 'links', 'items': ['Link', 'Unlink']},
+            {'name': 'insert',
+             'items': ['Image', 'Flash', 'HorizontalRule', 'Smiley']},
+            '/',
+            {'name': 'styles', 'items': ['Styles', 'Format', 'Font', 'FontSize']},
+            {'name': 'colors', 'items': ['TextColor', 'BGColor']}
+        ],
+        'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
+        'tabSpaces': 4,
+    }
+}

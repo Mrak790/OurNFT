@@ -1,3 +1,7 @@
+{% extends "accounts/layout/base.html" %} 
+
+{% block content %}
+
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
@@ -14,3 +18,5 @@
     <h3>Wrong image or secret</h3>
   {% endif %}
 {% endif %}
+
+{% endblock content %}

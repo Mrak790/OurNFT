@@ -58,8 +58,10 @@ class profile_view(TemplateView):
         #     return redirect('edit_profile')
         context = {
             'selected_user': request.user,
-            'notifications' : Notification.objects.filter(user=request.user)
+            # 'notifications' : Notification.objects.filter(user=request.user)
+            'notifications' : request.user.notifications.all()
         }
+        print(context['notifications'])
         return render(request, self.template_name, context)
 
 class EditProfileView(TemplateView):

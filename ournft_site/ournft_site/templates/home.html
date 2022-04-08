@@ -1,13 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
- 
-    <title>Our NFT</title>
-    <h1>Our NFT</h1>
-</head>
-<body class="container mt-5">
+{% extends "accounts/layout/base.html" %} 
+{% block content %}
 <nav class="mb-3">
+    <h1>Our NFT</h1>
     {% if user.is_authenticated %}
         <form action="{% url 'accounts:logout' %}" method="post">
             {% csrf_token %}
@@ -28,6 +22,4 @@
     </form>
     {% endif %}
 </nav>
-
-</body>
-</html>
+{% endblock content %}

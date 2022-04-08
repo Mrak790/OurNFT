@@ -1,13 +1,14 @@
 from django.shortcuts import render, get_object_or_404, reverse
 from django.contrib.auth.models import User
-from .forms import ImageForm, RestoreImageForm, TransferForm
-from .models import Image, History, Notification
+from .forms import ImageForm, RestoreImageForm, TransferForm, CommentForm
+from .models import Image, History, Notification, Comment
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from django.utils.timezone import make_aware
 from django.views.generic import TemplateView
 from django.http import HttpResponseNotFound, HttpResponseRedirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def image_view(request, image_hash):
@@ -15,8 +16,10 @@ def image_view(request, image_hash):
     if image.visibility or image.owner == request.user:
         history = History.objects.filter(referred_image=image)
         context = {
-            'image':image,
-            'history':history,
+            'image' : image,
+            'history' : history,
+            'comments' : image.comments.all(),
+            'new_comment' :  CommentForm()
         }
         return render(request, 'image.html', context)
     else :
@@ -66,38 +69,73 @@ def image_restore_view(request):
 
 
 class home(TemplateView):      
+    #login_url='home'
     template_name = "home.html"
     timeline_template_name = "timeline.html"
-
-    def dispatch(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return render(request, self.template_name)
-
+            
         context = {
             'images': Image.most_liked()[:10]
         }
-        
-        if request.method == 'POST':
-            form = ImageForm(request.POST, request.FILES)
-            if form.is_valid():
-                form.instance.owner = request.user
-                form.instance.image_hash = Image.GetImageHash(form.instance.image)
-                form.instance.secret = User.objects.make_random_password(length=20)
-                if Image.IsUnique(form.instance.image_hash):
-                    form.save()
-                    record = History(id=None, datetime=form.instance.upload_datetime, referred_image = form.instance,  referred_owner = form.instance.owner)
-                    record.save()
-                    context['form_obj'] = form.instance
-                    context['is_unique'] = True
-                else:
-                    context['form_obj'] = form.instance
-                    context['is_unique'] = False
-        else:
-            form = ImageForm()
+        form = ImageForm()
 
         context['form'] = form
         
         return render(request, self.timeline_template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        context = {
+            'images': Image.most_liked()[:10]
+        }
+        form = ImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.instance.owner = request.user
+            form.instance.image_hash = Image.GetImageHash(form.instance.image)
+            form.instance.secret = User.objects.make_random_password(length=20)
+            if Image.IsUnique(form.instance.image_hash):
+                form.save()
+                record = History(id=None, datetime=form.instance.upload_datetime, referred_image = form.instance,  referred_owner = form.instance.owner)
+                record.save()
+                context['form_obj'] = form.instance
+                context['is_unique'] = True
+            else:
+                context['form_obj'] = form.instance
+                context['is_unique'] = False
+        context['form'] = form
+        
+        return render(request, self.timeline_template_name, context)
+
+    # def dispatch(self, request, *args, **kwargs):
+    #     if not request.user.is_authenticated:
+    #         return render(request, self.template_name)
+
+    #     context = {
+    #         'images': Image.most_liked()[:10]
+    #     }
+        
+    #     if request.method == 'POST':
+    #         form = ImageForm(request.POST, request.FILES)
+    #         if form.is_valid():
+    #             form.instance.owner = request.user
+    #             form.instance.image_hash = Image.GetImageHash(form.instance.image)
+    #             form.instance.secret = User.objects.make_random_password(length=20)
+    #             if Image.IsUnique(form.instance.image_hash):
+    #                 form.save()
+    #                 record = History(id=None, datetime=form.instance.upload_datetime, referred_image = form.instance,  referred_owner = form.instance.owner)
+    #                 record.save()
+    #                 context['form_obj'] = form.instance
+    #                 context['is_unique'] = True
+    #             else:
+    #                 context['form_obj'] = form.instance
+    #                 context['is_unique'] = False
+    #     else:
+    #         form = ImageForm()
+
+    #     context['form'] = form
+        
+    #     return render(request, self.timeline_template_name, context)
 
 @login_required(login_url='home')
 def ImageLike(request, image_hash):
@@ -129,8 +167,13 @@ def image_transfer_view(request):
                 'image' : obj.image,
                 'form' : form
             }
-            notification = Notification(user=obj.owner, new_image=obj)
-            notification.save()
+            # notification = Notification(user=obj.owner, new_image=obj)
+            # notification.save()
+            print(obj, vars(obj))
+            obj.notifications.all().delete()
+            obj.owner.notifications.create(new_image=obj)
+            
+            
             return render(request, 'transfer.html', context)
         else:
             context = {
@@ -138,9 +181,7 @@ def image_transfer_view(request):
                 }    
             return render(request, 'transfer.html', context)
     else:
-        print("test")
         form = TransferForm(user=request.user)
-        print(request.user.username)
         context = {
             'asked' : False,
             'form' : form
@@ -148,8 +189,8 @@ def image_transfer_view(request):
         return render(request, 'transfer.html', context)
 
 @login_required(login_url='home')
-def GetTransfer(request, pk):
-    notification_obj = get_object_or_404(Notification, pk=pk)
+def GetTransfer(request, id):
+    notification_obj = get_object_or_404(Notification, id=id)
     if notification_obj.user == request.user:
         context = {
         'image' : notification_obj.new_image,
@@ -158,3 +199,24 @@ def GetTransfer(request, pk):
         return render(request, 'notification.html', context)
     else:
         return HttpResponseNotFound()
+
+class CommentView(LoginRequiredMixin,TemplateView):
+    login_url = 'home'
+    template_name = "comment.html"
+
+    def get(self, request, *args, **kwargs):
+        form = CommentForm()
+        print(vars(form))
+        return render(request, self.template_name, {'form':form})
+
+    def post(self, request, *args, **kwargs):
+        form = CommentForm(request.POST, request.FILES)
+        if form.is_valid():
+            image_obj = get_object_or_404(Image, image_hash=kwargs.get('image_hash', None))
+            form.instance.image = image_obj
+            form.instance.user=request.user
+            form.save()
+            next = request.POST.get('next', '/')
+            return HttpResponseRedirect(next)
+        else:
+            return HttpResponseNotFound()
