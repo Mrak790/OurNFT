@@ -20,3 +20,5 @@ run([env_pip, "install", "-r", "requirements.txt"])
 run([env_python, "ournft_site/generate_secret.py"])
 
 run([env_python, "ournft_site/manage.py", "migrate", "--run-syncdb"])
+
+run([env_python, "ournft_site/manage.py", "collectstatic"])
