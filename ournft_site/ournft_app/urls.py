@@ -14,5 +14,9 @@ urlpatterns = [
 
     path('transfer/', views.image_transfer_view),
 
-    path('notification/<int:pk>', views.GetTransfer, name='notification'),
+    path('notification/<slug:id>', views.GetTransfer, name='notification'),
+
+    path('create_comment/<slug:image_hash>', views.CommentView.as_view(), name='comment'),
+
+    path('ckeditor/', include('ckeditor_uploader.urls')),
 ]

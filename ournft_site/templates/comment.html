@@ -1,0 +1,9 @@
+
+<form action="{% url 'comment' image.image_hash %}" method='POST'>
+    <input type="hidden" name="next" value="{{ request.path }}">
+    {% csrf_token %}
+    {{ new_comment.media }}
+    <p> Add comment: </p>
+    <p> {{ new_comment.as_p }} </p>
+    <button type="submit">Comment</button>
+</form>

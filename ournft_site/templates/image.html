@@ -1,3 +1,7 @@
+{% extends "accounts/layout/base.html" %} 
+
+{% block content %}
+
 {% if image %}
   <img src="{{image.image.url}}" alt="connect" style="max-height:300px">
   <h3> Description: {{image.text}} </h3>
@@ -19,4 +23,19 @@
         </div>
     {% endfor %}
 </div>
+
+<div class="comments">
+    {% for comment in comments %}
+    <div class="comment">
+        {{comment.user.username}}
+        <img src="{{comment.user.profile.avatar.image.url}}" alt="connect" style="max-height:20px"> : 
+        {{comment.content|safe}}
+    </div>
+    {% endfor %}
+    <div class="new-comment">
+        {% include "comment.html" %}
+    </div>
+</div>
 {% endif %}
+
+{% endblock content %}

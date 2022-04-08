@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Count
 import imagehash
+import uuid
+from ckeditor.fields import RichTextField
 # Create your models here.
 DIFF_THRESHOLD = 0.2
 
@@ -70,5 +72,12 @@ class History(models.Model):
 
 
 class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="New Owner", related_name="Notification")
-    new_image = models.ForeignKey(Image, on_delete=models.CASCADE, verbose_name="New Image", related_name="Notification")
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="New Owner", related_name="notifications")
+    new_image = models.ForeignKey(Image, on_delete=models.CASCADE, verbose_name="New Image", related_name="notifications")
+
+class Comment(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE, verbose_name="User", related_name="comments")
+    image = models.ForeignKey(Image,on_delete=models.CASCADE, verbose_name="Image", related_name="comments")
+    content = RichTextField(blank=True, null=True)
+    # content = models.CharField(max_length = 100,blank=True, verbose_name="Text",null=True)

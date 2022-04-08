@@ -1,10 +1,18 @@
+from dataclasses import fields
 from tabnanny import verbose
 from django import forms
 
-from .models import Image
+from .models import Image, Comment
 
 from captcha.fields import CaptchaField
 from django.contrib.auth.models import User
+from django.utils.safestring import mark_safe
+
+
+class ImageChoiceField(forms.ModelChoiceField):
+
+    def label_from_instance(self, obj):
+        return mark_safe(f'<img src="{obj.image.url}" alt="connect" style="max-height:100px">')  
 
 class ImageForm(forms.ModelForm):
     """Form for the image model"""
@@ -23,7 +31,7 @@ class CaptchaForm(forms.Form):
 
 class TransferForm(forms.Form):
     recipient = forms.ModelChoiceField(queryset = User.objects.none(), label="Give to")
-    image_hash = forms.ModelChoiceField(queryset = Image.objects.none(),label="Image")
+    image_hash = ImageChoiceField(queryset = Image.objects.none(),label="Image",widget=forms.RadioSelect)
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
@@ -33,4 +41,7 @@ class TransferForm(forms.Form):
             self.fields['image_hash'].queryset = Image.objects.filter(owner=user)
         
         
-        
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content',]
