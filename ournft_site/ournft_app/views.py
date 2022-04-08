@@ -43,8 +43,10 @@ def image_restore_view(request):
                 'form' : form
                 }    
                 return render(request, 'restore.html', context)
-            if obj.owner.avatar == obj:
-                obj.owner.avatar = None
+            if obj.owner.profile.avatar == obj:
+                print("yeeeeeeeeeeee")
+                obj.owner.profile.avatar = None
+                obj.owner.profile.save()
             obj.owner = request.user
             obj.secret = User.objects.make_random_password(length=20)
             obj.save()
@@ -157,6 +159,9 @@ def image_transfer_view(request):
         if form.is_valid():
             
             obj = form.cleaned_data['image_hash']
+            if obj == obj.owner.profile.avatar:
+                obj.owner.profile.avatar = None
+                obj.owner.profile.save()
             obj.owner = form.cleaned_data['recipient']
             obj.secret = User.objects.make_random_password(length=20)
             obj.save()
@@ -213,10 +218,13 @@ class CommentView(LoginRequiredMixin,TemplateView):
         form = CommentForm(request.POST, request.FILES)
         if form.is_valid():
             image_obj = get_object_or_404(Image, image_hash=kwargs.get('image_hash', None))
-            form.instance.image = image_obj
-            form.instance.user=request.user
-            form.save()
-            next = request.POST.get('next', '/')
-            return HttpResponseRedirect(next)
+            if image_obj.visibility or image_obj.owner==request.user:
+                form.instance.image = image_obj
+                form.instance.user = request.user
+                form.save()
+                next = request.POST.get('next', '/')
+                return HttpResponseRedirect(next)
+            else:
+                return HttpResponseNotFound()
         else:
             return HttpResponseNotFound()
