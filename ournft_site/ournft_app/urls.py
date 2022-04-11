@@ -19,4 +19,6 @@ urlpatterns = [
     path('create_comment/<slug:image_hash>', views.CommentView.as_view(), name='comment'),
 
     path('ckeditor/', include('ckeditor_uploader.urls')),
+
+    path('feed/', views.FeedView.as_view(), name='feed')
 ]

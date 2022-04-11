@@ -1,3 +1,4 @@
+from msilib.schema import ListView
 from django.shortcuts import render, get_object_or_404, reverse
 from django.contrib.auth.models import User
 from .forms import ImageForm, RestoreImageForm, TransferForm, CommentForm
@@ -6,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from django.utils.timezone import make_aware
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -228,3 +229,14 @@ class CommentView(LoginRequiredMixin,TemplateView):
                 return HttpResponseNotFound()
         else:
             return HttpResponseNotFound()
+
+class FeedView(ListView):
+    model = Image
+    template_name = "feed.html"
+    context_object_name = 'images'
+
+    def get_queryset(self):
+        queryset = {'public_images': Image.public.all(), 
+                    'user_images': self.request.user.images.all() if self.request.user.is_authenticated else None,
+                    'popular_images': Image.most_liked()[:10]}
+        return queryset

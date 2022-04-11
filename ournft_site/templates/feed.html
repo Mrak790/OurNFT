@@ -1,0 +1,25 @@
+{% extends "accounts/layout/base.html" %} 
+
+{% block content %}
+
+{% if images.user_images %}
+    <h1> Your Images: </h1>
+    {% for image in images.user_images %}
+        <img src="{{image.image.url}}" alt="connect" style="max-height:80px">
+        <h3> Description: {{image.text}} </h3>
+    {% endfor %}
+{% endif %}
+
+<h1> Popular Images: </h1>
+{% for image in images.popular_images %}
+    <img src="{{image.image.url}}" alt="connect" style="max-height:80px">
+    <h3> Description: {{image.text}} </h3>
+{% endfor %}
+
+<h1> All images: </h1>
+{% for image in images.public_images %}
+    <img src="{{image.image.url}}" alt="connect" style="max-height:80px">
+    <h3> Description: {{image.text}} </h3>
+{% endfor %}
+
+{% endblock content %}
