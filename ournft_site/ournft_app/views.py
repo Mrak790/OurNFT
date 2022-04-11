@@ -1,4 +1,3 @@
-from msilib.schema import ListView
 from django.shortcuts import render, get_object_or_404, reverse
 from django.contrib.auth.models import User
 from .forms import ImageForm, RestoreImageForm, TransferForm, CommentForm
