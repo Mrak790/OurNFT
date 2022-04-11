@@ -6,4 +6,4 @@ ournft_site/db.sqlite3
 .vscode/
 ournft_site/media/
 migrations/
-ournft_site/static/
+ournft_site/static
