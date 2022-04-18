@@ -7,12 +7,13 @@ from .models import Image, Comment
 from captcha.fields import CaptchaField
 from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 
 
 class ImageChoiceField(forms.ModelChoiceField):
 
     def label_from_instance(self, obj):
-        return mark_safe(f'<img src="{obj.image.url}" alt="connect" style="max-height:100px">')  
+        return format_html('<img src="{}" alt="connect" style="max-height:100px">', obj.image.url)  
 
 class ImageForm(forms.ModelForm):
     """Form for the image model"""

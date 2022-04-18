@@ -168,5 +168,8 @@ CKEDITOR_CONFIGS = {
         ],
         'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
         'tabSpaces': 4,
+        # 'removePlugins': 'stylesheetparser',
+        # 'allowedContent': 'b a',
+        # 'disallowedContent' : 'script p'
     }
 }

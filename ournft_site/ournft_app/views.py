@@ -9,7 +9,10 @@ from django.utils.timezone import make_aware
 from django.views.generic import TemplateView, ListView
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
+import bleach
 
+def bleach_template(input):
+    return bleach.clean(input, tags=['p'])
 
 def image_view(request, image_hash):
     image = get_object_or_404(Image, image_hash=image_hash)
@@ -19,7 +22,8 @@ def image_view(request, image_hash):
             'image' : image,
             'history' : history,
             'comments' : image.comments.all(),
-            'new_comment' :  CommentForm()
+            'new_comment' :  CommentForm(),
+            'sanitizer': bleach_template
         }
         return render(request, 'image.html', context)
     else :

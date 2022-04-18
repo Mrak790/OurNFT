@@ -25,11 +25,12 @@
 </div>
 
 <div class="comments">
+    {% load comment_filter %}
     {% for comment in comments %}
     <div class="comment">
         {{comment.user.username}}
         <img src="{{comment.user.profile.avatar.image.url}}" alt="connect" style="max-height:20px"> : 
-        {{comment.content|safe}}
+        {{ comment.content|safe_comment }}
     </div>
     {% endfor %}
     <div class="new-comment">
