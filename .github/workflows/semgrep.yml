@@ -1,92 +1,21 @@
-name: Semgrep
-
 on:
-  # Scan changed files in PRs, block on new issues only (existing issues ignored)
   pull_request: {}
-
-  # Scan all files on branches, block on any issues
-  # push:
-  #   branches: ["master", "main"]
-
-  # Schedule this job to run at a certain time, using cron syntax
-  # Note that * is a special character in YAML so you have to quote this string
-  # schedule:
-  #   - cron: '30 0 1,15 * *' # scheduled for 00:30 UTC on both the 1st and 15th of the month
-
+  push:
+    branches:
+    - main
+    paths:
+    - .github/workflows/semgrep.yml
+  schedule:
+  - cron: '0 0 * * 0'
+name: Semgrep
 jobs:
   semgrep:
     name: Scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+    env:
+      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
     container:
       image: returntocorp/semgrep
-    # Skip any PR created by dependabot to avoid permission issues
-    if: (github.actor != 'dependabot[bot]')
     steps:
-      # Fetch project source
-      - uses: actions/checkout@v3
-
-      - run: semgrep ci
-        env:
-          # Select rules for your scan with one of these two options.
-          # Option 1: set hard-coded rulesets
-          SEMGREP_RULES: >- # more at semgrep.dev/r
-            p/security-audit
-            p/secrets
-          # Option 2: scan with rules set in Semgrep App's rule board
-          # SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-
-
-
-
-
-
-
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# This workflow file requires a free account on Semgrep.dev to
-# manage rules, file ignores, notifications, and more.
-#
-# See https://semgrep.dev/docs
-
-# name: Semgrep
-
-# on:
-#   push:
-#     branches: [ main ]
-#   pull_request:
-#     # The branches below must be a subset of the branches above
-#     branches: [ main ]
-#   #schedule:
-#    # - cron: '40 16 * * 0'
-
-# permissions:
-#   contents: read
-
-# jobs:
-#   semgrep:
-#     permissions:
-#       contents: read # for actions/checkout to fetch code
-#       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-#     name: Scan
-#     runs-on: ubuntu-latest
-#     steps:
-#       # Checkout project source
-#       - uses: actions/checkout@v3
-
-      # Scan code using project's configuration on https://semgrep.dev/manage
-     # - uses: returntocorp/semgrep-action@fcd5ab7459e8d91cb1777481980d1b18b4fc6735
-      #  with:
-     #     publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
-     #     publishDeployment: ${{ secrets.SEMGREP_DEPLOYMENT_ID }}
-     #     generateSarif: "1"
-
-      # Upload SARIF file generated in previous step
-      #- name: Upload SARIF file
-      #  uses: github/codeql-action/upload-sarif@v2
-      #  with:
-     #     sarif_file: semgrep.sarif
-     #   if: always()
+    - uses: actions/checkout@v3
+    - run: semgrep ci
