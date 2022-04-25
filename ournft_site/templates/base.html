@@ -56,8 +56,12 @@
 				<li class="nav-item">
 					<a class="nav-link" href="/accounts/profile">Profile</a>
 				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="/restore">Restore Image</a>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Restore</a>
+          			<div class="dropdown-menu">
+						<a class="dropdown-item" href="/restore">Image Restore</a>
+						<a class="dropdown-item" href="/token_restore">Token Restore</a>
+					</div>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="/feed">Image Feed</a>
@@ -77,6 +81,9 @@
 				{% if request.user.is_staff %}
 				<li class="nav-item">
 					<a class="nav-link" href="/report_list">Reports</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/ban_user">Ban User</a>
 				</li>
 				{% endif %}
 			</ul>

@@ -27,7 +27,7 @@ def signup_view(request):
         if form.is_valid() and form_captcha.is_valid():
             user = form.save()
             Profile(user=user).save()
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            login(request, user)
             return redirect('home') 
     else:
         form = UserCreationForm()
@@ -39,7 +39,7 @@ def login_view(request):
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            login(request, user)
             return redirect('home')
     else:
         form = AuthenticationForm()
