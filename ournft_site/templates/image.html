@@ -1,36 +1,60 @@
-{% extends "accounts/layout/base.html" %} 
+{% extends "base.html" %}
 
 {% block content %}
 
 {% if image %}
-  <img src="{{image.image.url}}" alt="connect" style="max-height:300px">
-  <h3> Description: {{image.text}} </h3>
-  <h3> Current owner: {{image.owner}} </h3>
-  <h3> Uploaded: {{image.upload_datetime}} </h3>
-  <h3> Visible: {{image.visibility}} </h3>
-
-  {% include "likes.html" %}
-  <h3> Liked: {% for user in image.likes.all %} {{user}}; {% endfor %} </h3>
-  <div class="history">
+<img src="{{image.image.url}}" alt="connect" style="max-height:300px">
+{% if request.user.is_staff %}
+<form action="{% url 'ban_image' image.image_hash  %}" method='POST'>
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <button type="submit" class="btn btn-danger">Ban</button>
+</form>
+{% endif %}
+<h3> Description: {{image.text}} </h3>
+<h3> Current owner: {{image.owner}} </h3>
+<h3> Uploaded: {{image.upload_datetime}} </h3>
+<h3> Visible: {{image.visibility}} </h3>
+{% if not image.banned and image.owner == request.user %}
+<form action="{% url 'switch_visibility' image.image_hash  %}" method='POST'>
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    {% if image.visibility %}
+        <button type="submit" class="button">Make Private</button>
+    {% else %}
+        <button type="submit" class="button">Make Public</button>
+    {% endif %}
+</form>
+{% endif %}
+{% include "likes.html" %}
+<h3> Liked: {% for user in image.likes.all %} {{user}}; {% endfor %} </h3>
+<div class="history">
     <h3> History of ownership: </h3>
     {% for record in history %}
-        <div class="card">
-            <div class="card-body">
-                {% if record %}
-                    Owner: {{record.referred_owner}}; Since: {{record.datetime}}
-                {% endif %}
-            </div>
+    <div class="card">
+        <div class="card-body">
+            {% if record %}
+            Owner: {{record.referred_owner}}; Since: {{record.datetime}}
+            {% endif %}
         </div>
+    </div>
     {% endfor %}
 </div>
 
 <div class="comments">
     {% load comment_filter %}
     {% for comment in comments %}
-    <div class="comment">
+    <div class="card">
         {{comment.user.username}}
-        <img src="{{comment.user.profile.avatar.image.url}}" alt="connect" style="max-height:20px"> : 
+        <img src="{{comment.user.profile.avatar.image.url}}" alt="connect" style="max-height:20px"> :
         {{ comment.content|safe_comment }}
+        {% if request.user.is_staff %}
+        <form action="{% url 'delete_comment' comment.id  %}" method='POST'>
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit">Delete</button>
+        </form>
+        {% endif %}
     </div>
     {% endfor %}
     <div class="new-comment">

@@ -1,18 +1,11 @@
-{% extends "accounts/layout/base.html" %} 
+{% extends "base.html" %} 
 
 {% block content %}
 
-<h1>Our NFT</h1>
-<form action="{% url 'accounts:logout' %}" method="post">
-  {% csrf_token %}
-  <button class="btn btn-primary btn-sm" type="submit">Log Out</button>
-</form>
-<br />
-<form action="{% url 'accounts:profile' %}" method="get">
-  <button class="btn btn-primary btn-sm" type="submit">Profile</button>
-</form>
-<br />
 <div class="col-6 content">
+  {% if request.user.profile.banned %}
+  <h3>You are banned!</h3>
+  {% else %}
   <div class="card">
     <div class="card-body">
       <form method="post" name="new-post-form" enctype="multipart/form-data">
@@ -29,6 +22,7 @@
   <h3>Image is not unique</h3>
   {% endif %} {% endif %}
   <br />
+  {% endif %}
   <div class="timeline">
     {% for image in images %}
     <div class="card">

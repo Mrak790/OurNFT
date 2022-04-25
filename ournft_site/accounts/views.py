@@ -15,6 +15,8 @@ from ournft_app.forms import CaptchaForm
 from ournft_app.models import Image, Notification
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
+# from django.contrib.auth import get_user_model
+# User = get_user_model()
 
 def signup_view(request):
 
@@ -26,23 +28,25 @@ def signup_view(request):
         if form.is_valid() and form_captcha.is_valid():
             user = form.save()
             Profile(user=user).save()
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            authorize(user)
             return redirect('home') 
     else:
         form = UserCreationForm()
         form_captcha = CaptchaForm()
-    return render(request, 'accounts/signup.html', {'form': form, 'form_captcha':form_captcha})
+    return render(request, 'signup.html', {'form': form, 'form_captcha':form_captcha})
 
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            authorize(user)
             return redirect('home')
     else:
         form = AuthenticationForm()
-    return render(request, 'accounts/login.html', {'form': form})
+    return render(request, 'login.html', {'form': form})
 
 def logout_view(request):
     if request.method == 'POST':
@@ -50,7 +54,7 @@ def logout_view(request):
         return redirect('home')
 
 class profile_view(TemplateView):
-    template_name = "accounts/profile.html"
+    template_name = "profile.html"
 
 
     def dispatch(self, request, *args, **kwargs):
@@ -61,11 +65,10 @@ class profile_view(TemplateView):
             # 'notifications' : Notification.objects.filter(user=request.user)
             'notifications' : request.user.notifications.all()
         }
-        print(context['notifications'])
         return render(request, self.template_name, context)
 
 class EditProfileView(TemplateView):
-    template_name = "accounts/edit_profile.html"
+    template_name = "edit_profile.html"
 
     def dispatch(self, request, *args, **kwargs):
         form = ProfileForm(instance=self.get_profile(request.user))
@@ -101,3 +104,8 @@ def SetAvatar(request, image_hash):
     next = request.POST.get('next', '/')
     return HttpResponseRedirect(next)
 
+from guardian.shortcuts import assign_perm, remove_perm
+def authorize(user):
+    remove_perm('ournft_app.view_image', user)
+    print(assign_perm('ournft_app.add_image', user))
+    print(assign_perm('ournft_app.view_image', user, Image.public.all()|Image.objects.filter(owner=user)))

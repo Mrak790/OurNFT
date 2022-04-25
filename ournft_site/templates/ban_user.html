@@ -5,14 +5,15 @@
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
   {{form.as_p}}
-  <button type="submit">Upload</button>
+  <button type="submit">Update</button>
 </form>
 
 {% if accepted %}
-  <h3>Succesfully transferred!</h3>
-  {% if image %}
-    <img src="{{ image.url }}" alt="connect" style="max-height:300px">
-  {% endif %}
+    {% if banned %}
+        <h3>Succesfully banned {{username}}!</h3>
+    {% else %}
+        <h3>Succesfully unbanned {{username}}!</h3>   
+    {% endif %}
 {% endif %}
 
 {% endblock content %}

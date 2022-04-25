@@ -1,0 +1,17 @@
+{% extends "base.html" %} 
+
+{% block content %}
+
+<h1> Reports: </h1>
+{% for report in reports %}
+<div class="card">
+    <div>
+        <a href="{{report.link}}" target="_blank" rel="noopener noreferrer">{{report.link}}</a>
+    </div>
+    <div>
+        {{report.text}}
+    </div>
+</div>
+{% endfor %}
+
+{% endblock content %}
