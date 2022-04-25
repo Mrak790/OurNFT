@@ -15,8 +15,7 @@ from ournft_app.forms import CaptchaForm
 from ournft_app.models import Image, Notification
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-# from django.contrib.auth import get_user_model
-# User = get_user_model()
+
 
 def signup_view(request):
 
@@ -29,7 +28,6 @@ def signup_view(request):
             user = form.save()
             Profile(user=user).save()
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            authorize(user)
             return redirect('home') 
     else:
         form = UserCreationForm()
@@ -42,7 +40,6 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            authorize(user)
             return redirect('home')
     else:
         form = AuthenticationForm()
@@ -103,9 +100,3 @@ def SetAvatar(request, image_hash):
         profile.save()
     next = request.POST.get('next', '/')
     return HttpResponseRedirect(next)
-
-from guardian.shortcuts import assign_perm, remove_perm
-def authorize(user):
-    remove_perm('ournft_app.view_image', user)
-    print(assign_perm('ournft_app.add_image', user))
-    print(assign_perm('ournft_app.view_image', user, Image.public.all()|Image.objects.filter(owner=user)))
