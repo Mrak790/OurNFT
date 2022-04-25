@@ -12,13 +12,9 @@ from datetime import datetime
 from django.utils.timezone import make_aware
 from django.views.generic import TemplateView, ListView, CreateView
 from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponseForbidden
-# from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import SingleObjectMixin
-from guardian.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
-# from django.contrib.auth import get_user_model
-
-# User = get_user_model()
 
 class ImageView(LoginRequiredMixin, TemplateView):
     template_name = 'image.html'
@@ -28,13 +24,14 @@ class ImageView(LoginRequiredMixin, TemplateView):
 
         if image_object.visibility==False and image_object.owner!=request.user and not request.user.is_staff:
             return HttpResponseForbidden("Image is private")
-
+          
         context = {
             'image' : image_object,
             'history' : History.of_image(image_object),
             'comments' : image_object.comments.all(),
             'new_comment' :  CommentForm(),
         }
+        
         return render(request, self.template_name, context)
 
 class ImageRestoreView(LoginRequiredMixin, TemplateView):
