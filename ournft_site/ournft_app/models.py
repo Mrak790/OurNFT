@@ -4,6 +4,9 @@ from django.db.models import Count
 import imagehash
 import uuid
 from ckeditor.fields import RichTextField
+# from django.contrib.auth import get_user_model
+
+# User = get_user_model()
 # Create your models here.
 DIFF_THRESHOLD = 0.2
 
@@ -31,6 +34,7 @@ class Image(models.Model):
     text = models.CharField(max_length=200, verbose_name="Text", null=True, blank=True)
     visibility = models.BooleanField(verbose_name="Visible", null=False)
     secret = models.CharField(max_length=50,verbose_name="Secret", null=False)
+    banned = models.BooleanField(verbose_name="Banned", default=False, null=False)
     likes = models.ManyToManyField(User, related_name="likes", blank=True)
 
 
@@ -39,7 +43,7 @@ class Image(models.Model):
     
 
     def save(self, *args, **kwargs):
-        if self.pk:
+        if self.pk is None:
             print("create image object")
         else:
             print("change image object")
@@ -70,6 +74,9 @@ class History(models.Model):
     referred_owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Owner", related_name="record")
     referred_image = models.ForeignKey(Image, on_delete=models.CASCADE, verbose_name="Image", related_name="record")
 
+    def of_image(image):
+        return History.objects.filter(referred_image=image)
+
 
 class Notification(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -77,7 +84,12 @@ class Notification(models.Model):
     new_image = models.ForeignKey(Image, on_delete=models.CASCADE, verbose_name="New Image", related_name="notifications")
 
 class Comment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User,on_delete=models.CASCADE, verbose_name="User", related_name="comments")
     image = models.ForeignKey(Image,on_delete=models.CASCADE, verbose_name="Image", related_name="comments")
     content = RichTextField(blank=True, null=True)
-    # content = models.CharField(max_length = 100,blank=True, verbose_name="Text",null=True)
+
+class Report(models.Model):
+    link = models.URLField(verbose_name='Link', null=False, blank=False, max_length=50)
+    text = models.TextField(verbose_name='Text', null=False, blank='True', max_length='500')
+

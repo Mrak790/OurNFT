@@ -1,4 +1,4 @@
-{% extends "accounts/layout/base.html" %} 
+{% extends "base.html" %} 
 {% load static %}
 
 {% block content %}
@@ -24,11 +24,6 @@
                     </a>
                 </p>
             {% endfor %}
-            {% if selected_user.id == user.id %}
-                <form action="{% url 'accounts:edit_profile' %}" method="get">
-                    <button class="btn btn-primary btn-sm" type="submit">Edit</button>
-                </form>
-            {% endif %}
         </div>
         <div class="col">
             <dl class="row">
@@ -40,11 +35,12 @@
                 <dd class="col-sm-9"><em style="font-family: 'Times New Roman', serif;">{{ selected_user.profile.bio|linebreaks }}</em></dd>
             </dl>
         </div>
+        {% if selected_user.id == user.id %}
+            <form action="{% url 'accounts:edit_profile' %}" method="get">
+                <button class="btn btn-primary btn-sm" type="submit">Edit</button>
+            </form>
+        {% endif %}
     </div>
 </div>
-
-<form action="{% url 'home' %}" method="get">
-    <button class="btn btn-primary btn-sm" type="submit">Main page</button>
-</form>
 
 {% endblock content %}

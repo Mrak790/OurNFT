@@ -8,8 +8,9 @@ from django.contrib.auth.models import User
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name=u"User")
     bio = models.TextField(max_length=500, blank=True, null=True, verbose_name=u"Info")
-    avatar = models.OneToOneField(Image, on_delete=models.CASCADE, verbose_name=u"Avatar", null=True)
-
+    avatar = models.OneToOneField(Image, on_delete=models.CASCADE, verbose_name=u"Avatar", null=True, blank=True)
+    banned = models.BooleanField(verbose_name="Banned", default=False, null=False)
+    
     class Meta:
         verbose_name = 'User Profile'
 

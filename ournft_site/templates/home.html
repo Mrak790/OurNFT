@@ -1,7 +1,6 @@
-{% extends "accounts/layout/base.html" %} 
+{% extends "base.html" %} 
 {% block content %}
 <nav class="mb-3">
-    <h1>Our NFT</h1>
     {% if user.is_authenticated %}
         <form action="{% url 'accounts:logout' %}" method="post">
             {% csrf_token %}

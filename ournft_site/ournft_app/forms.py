@@ -1,19 +1,16 @@
-from dataclasses import fields
-from tabnanny import verbose
 from django import forms
 
-from .models import Image, Comment
+from .models import Image, Comment, Report
 
 from captcha.fields import CaptchaField
 from django.contrib.auth.models import User
-from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 
 
 class ImageChoiceField(forms.ModelChoiceField):
 
     def label_from_instance(self, obj):
-        return format_html('<img src="{}" alt="connect" style="max-height:100px">', obj.image.url)  
+        return format_html('<img src="{}" alt="connect" style="max-height:80px">', obj.image.url)  
 
 class ImageForm(forms.ModelForm):
     """Form for the image model"""
@@ -38,7 +35,7 @@ class TransferForm(forms.Form):
         user = kwargs.pop('user', None)
         super(TransferForm, self).__init__(*args, **kwargs)
         if user:
-            self.fields['recipient'].queryset = User.objects.exclude(pk = user.pk)
+            self.fields['recipient'].queryset = User.objects.exclude(pk = user.pk).exclude(username='AnonymousUser')
             self.fields['image_hash'].queryset = Image.objects.filter(owner=user)
         
         
@@ -46,3 +43,30 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['content',]
+
+class ReportForm(forms.ModelForm):
+    class Meta:
+        model= Report
+        fields = ['link','text']
+
+class BanUserForm(forms.Form):
+    user = forms.ModelChoiceField(queryset = User.objects.none(), label="Ban user")
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(BanUserForm, self).__init__(*args, **kwargs)
+        if user:
+            self.fields['user'].queryset = User.objects.exclude(pk = user.pk).exclude(username='AnonymousUser').filter(is_staff=False)
+
+class TokenRestoreForm(forms.ModelForm):
+    class Meta:
+        model = Image
+        fields = ['image_hash', 'secret']
+
+class ModerTokenRestoreForm(forms.ModelForm):
+
+    user = forms.ModelChoiceField(queryset = User.objects.exclude(username='AnonymousUser'), label="User")
+    
+    class Meta:
+        model = Image
+        fields = ['image_hash', 'secret']
+    

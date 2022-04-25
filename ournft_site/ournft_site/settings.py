@@ -173,3 +173,5 @@ CKEDITOR_CONFIGS = {
         # 'disallowedContent' : 'script p'
     }
 }
+
+AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend')
